@@ -1,4 +1,3 @@
-# flake.nix
 {
   description = "TypeScript-Go - An implementation of TypeScript in Go";
   inputs = {
@@ -16,35 +15,27 @@
           inherit system;
         };
         
-        # Import the sources.json for versioning
         sources = builtins.fromJSON (builtins.readFile ./sources.json);
         
-        # Create an overlay for TypeScript-Go
         typescript-go-overlay = final: prev: {
-          # Latest nightly build of TypeScript-Go
           typescript-go-nightly = final.callPackage ./default.nix {
             sourceInfo = sources.typescript-go-nightly;
           };
         };
       in
       {
-        # Overlays for use in other flakes
         overlays.default = typescript-go-overlay;
         
-        # Packages for direct use
         packages = {
-          # Default is the nightly version for now
           default = pkgs.callPackage ./default.nix {
             sourceInfo = sources.typescript-go-nightly;
           };
           
-          # Nightly build explicitly named
           typescript-go-nightly = pkgs.callPackage ./default.nix {
             sourceInfo = sources.typescript-go-nightly;
           };
         };
         
-        # Apps for direct execution with nix run
         apps = {
           default = {
             type = "app";
@@ -52,22 +43,17 @@
           };
         };
         
-        # Development shell with all dependencies
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             go_1_24
-            nodejs_20
+            nodejs_22
             git
             jq
             curl
           ];
           
           shellHook = ''
-            echo "TypeScript-Go development environment"
-            echo ""
-            echo "Commands:"
-            echo "  ./update.sh            - Update sources.json with latest TypeScript-Go"
-            echo ""
+            echo "bingbong"
           '';
         };
         

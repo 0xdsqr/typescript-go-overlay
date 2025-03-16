@@ -1,4 +1,3 @@
-# default.nix
 { pkgs, lib ? pkgs.lib, sourceInfo }:
 
 pkgs.stdenv.mkDerivation rec {
@@ -9,33 +8,28 @@ pkgs.stdenv.mkDerivation rec {
     owner = "microsoft";
     repo = "typescript-go";
     rev = sourceInfo.commit or sourceInfo.version;
-    sha256 = sourceInfo.sha256;
+    sha256 = "cPu/DdgW7HEQcH8kcu6dazEgHEXsTVMnZ2feqVR5gNA=";
     fetchSubmodules = true; # Critical: initializes the TypeScript submodule
   };
   
-  # Build-time dependencies
   nativeBuildInputs = with pkgs; [
     go_1_24
-    nodejs_20
+    nodejs_22
     git
   ];
   
-  # Run-time dependencies (minimal for this package)
   buildInputs = [];
   
-  # Setup phase - install npm dependencies including hereby
   setupPhase = ''
     export HOME=$TMPDIR
     npm ci
   '';
   
-  # Build the project using 'hereby'
   buildPhase = ''
     export HOME=$TMPDIR
     ./node_modules/.bin/hereby build
   '';
   
-  # Install the binaries and create helper scripts
   installPhase = ''
     # Create output directory
     mkdir -p $out/bin

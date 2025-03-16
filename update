@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#! nix-shell -p curl jq -i bash
+#! nix-shell -p curl jq -i sh
 set -e
 
 echo "Updating TypeScript-Go versions..."
@@ -32,8 +32,8 @@ CURRENT_DATE=$(date +%Y-%m-%d)
 TARBALL_URL="https://github.com/microsoft/typescript-go/archive/${LATEST_COMMIT}.tar.gz"
 curl -sL "${TARBALL_URL}" -o typescript-go-latest.tar.gz
 
-# Compute SHA256 hash
-SHA256=$(nix-hash --type sha256 --flat typescript-go-latest.tar.gz)
+# Compute SHA256 hash in the format expected by fetchFromGitHub
+SHA256=$(nix-prefetch-url --unpack ${TARBALL_URL} 2>/dev/null)
 echo "SHA256: ${SHA256}"
 
 # Create a temporary file with the new entries
