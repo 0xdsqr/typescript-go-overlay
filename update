@@ -25,9 +25,10 @@ CURRENT_DATE=$(date +%Y-%m-%d)
 # Set up the tarball URL
 TARBALL_URL="https://github.com/microsoft/typescript-go/archive/${LATEST_COMMIT}.tar.gz"
 
-# Get the SHA256 hash in the format that Nix's fetchFromGitHub expects (base64-encoded)
-SHA256_NIX=$(nix-prefetch-url --unpack ${TARBALL_URL} 2>/dev/null)
-echo "SHA256: ${SHA256_NIX}"
+# Get the SHA256 hash in Nix format (hex) and convert to base64
+SHA256_HEX=$(nix-prefetch-url --unpack ${TARBALL_URL} 2>/dev/null)
+SHA256_NIX=$(nix hash convert --type sha256 --to base64 ${SHA256_HEX})
+echo "SHA256 (base64): ${SHA256_NIX}"
 
 # Create a temporary file with the new entries
 cat > sources.new.json << EOF
