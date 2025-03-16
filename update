@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#! nix-shell -p curl jq -i sh
+#! nix-shell -p curl jq nix-prefetch-github -i sh
 set -e
 
 echo "Updating TypeScript-Go versions..."
@@ -22,13 +22,14 @@ fi
 # Get current date for versioning
 CURRENT_DATE=$(date +%Y-%m-%d)
 
-# Download the latest tarball to compute hash
-TARBALL_URL="https://github.com/microsoft/typescript-go/archive/${LATEST_COMMIT}.tar.gz"
-curl -sL "${TARBALL_URL}" -o typescript-go-latest.tar.gz
-
-# Compute SHA256 hash in the format expected by fetchFromGitHub
-SHA256=$(nix-prefetch-url --unpack ${TARBALL_URL} 2>/dev/null)
+# Use nix-prefetch-github which is more reliable for GitHub repositories
+# This fetches the repo info and calculates the hash in one step
+REPO_INFO=$(nix-prefetch-github --rev "$LATEST_COMMIT" microsoft typescript-go)
+SHA256=$(echo "$REPO_INFO" | jq -r '.sha256')
 echo "SHA256: ${SHA256}"
+
+# Set up the tarball URL
+TARBALL_URL="https://github.com/microsoft/typescript-go/archive/${LATEST_COMMIT}.tar.gz"
 
 # Create a temporary file with the new entries
 cat > sources.new.json << EOF
@@ -60,4 +61,4 @@ mv sources.json.tmp sources.json
 echo "Updated TypeScript-Go nightly to commit ${LATEST_COMMIT} (${CURRENT_DATE})"
 
 # Clean up
-rm -f typescript-go-latest.tar.gz sources.new.json
+rm -f sources.new.json

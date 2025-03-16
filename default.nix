@@ -8,7 +8,7 @@ pkgs.stdenv.mkDerivation rec {
     owner = "microsoft";
     repo = "typescript-go";
     rev = sourceInfo.commit or sourceInfo.version;
-    sha256 = "cPu/DdgW7HEQcH8kcu6dazEgHEXsTVMnZ2feqVR5gNA=";
+    sha256 = sourceInfo.sha256;
     fetchSubmodules = true; # Critical: initializes the TypeScript submodule
   };
   
@@ -21,8 +21,14 @@ pkgs.stdenv.mkDerivation rec {
   buildInputs = [];
   
   setupPhase = ''
+    echo "Setting up build environment..."
     export HOME=$TMPDIR
-    npm ci
+    echo "Checking git submodules..."
+    git submodule status || echo "No submodules found"
+    
+    echo "Installing npm dependencies (this may take several minutes)..."
+    npm ci --verbose
+    echo "Setup phase completed."
   '';
   
   buildPhase = ''
