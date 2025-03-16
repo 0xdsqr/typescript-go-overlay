@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#! nix-shell -p curl jq nix-prefetch-github -i sh
+#! nix-shell -p curl jq nix -i sh
 set -e
 
 echo "Updating TypeScript-Go versions..."
@@ -22,28 +22,26 @@ fi
 # Get current date for versioning
 CURRENT_DATE=$(date +%Y-%m-%d)
 
-# Use nix-prefetch-github which is more reliable for GitHub repositories
-# This fetches the repo info and calculates the hash in one step
-REPO_INFO=$(nix-prefetch-github --rev "$LATEST_COMMIT" microsoft typescript-go)
-SHA256=$(echo "$REPO_INFO" | jq -r '.sha256')
-echo "SHA256: ${SHA256}"
-
 # Set up the tarball URL
 TARBALL_URL="https://github.com/microsoft/typescript-go/archive/${LATEST_COMMIT}.tar.gz"
+
+# Get the SHA256 hash in the format that Nix's fetchFromGitHub expects (base64-encoded)
+SHA256_NIX=$(nix-prefetch-url --unpack ${TARBALL_URL} 2>/dev/null)
+echo "SHA256: ${SHA256_NIX}"
 
 # Create a temporary file with the new entries
 cat > sources.new.json << EOF
 {
   "typescript-go-nightly": {
     "version": "${LATEST_COMMIT}",
-    "sha256": "${SHA256}",
+    "sha256": "${SHA256_NIX}",
     "url": "${TARBALL_URL}",
     "date": "${CURRENT_DATE}",
     "commit": "${LATEST_COMMIT}"
   },
   "nightly-${CURRENT_DATE}": {
     "version": "${LATEST_COMMIT}",
-    "sha256": "${SHA256}",
+    "sha256": "${SHA256_NIX}",
     "url": "${TARBALL_URL}",
     "date": "${CURRENT_DATE}",
     "commit": "${LATEST_COMMIT}"
