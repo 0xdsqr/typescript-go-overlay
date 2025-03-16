@@ -1,75 +1,83 @@
 { pkgs, lib ? pkgs.lib, sourceInfo }:
-
 pkgs.stdenv.mkDerivation rec {
   pname = "typescript-go";
   version = sourceInfo.version;
-  
-  src = pkgs.fetchFromGitHub {
-    owner = "microsoft";
-    repo = "typescript-go";
+  src = pkgs.fetchgit {
+    url = "https://github.com/microsoft/typescript-go.git";
     rev = sourceInfo.commit or sourceInfo.version;
-    sha256 = sourceInfo.sha256;
-    fetchSubmodules = true; # Critical: initializes the TypeScript submodule
+    sha256 = "sha256-cPu/DdgW7HEQcH8kcu6dazEgHEXsTVMnZ2feqVR5gNA="; # Will be updated by --update-input
+    fetchSubmodules = true;
+    leaveDotGit = false;
   };
   
   nativeBuildInputs = with pkgs; [
     go_1_24
     nodejs_22
     git
+    cacert
   ];
   
   buildInputs = [];
   
+  # Environment variables for npm
+  NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  
   setupPhase = ''
-    echo "Setting up build environment..."
-    export HOME=$TMPDIR
-    echo "Checking git submodules..."
-    git submodule status || echo "No submodules found"
+    echo "setup phase..."
+    echo "Source directory contents:"
+    ls -la
     
-    echo "Installing npm dependencies (this may take several minutes)..."
+    # Verify submodules
+    echo "Checking submodules:"
+    ls -la _submodules
+    
+    # Check specifically for the TypeScript submodule
+    if [ -d "_submodules/TypeScript" ]; then
+      echo "TypeScript submodule exists"
+      echo "TypeScript submodule contents:"
+      ls -la _submodules/TypeScript | head
+    else
+      echo "ERROR: TypeScript submodule is missing!"
+      exit 1
+    fi
+    
+    # Create npm cache directory within the build directory
+    mkdir -p .npm-cache
+    export npm_config_cache=$(pwd)/.npm-cache
+    export HOME=$(pwd)
+    
+    # Install npm dependencies 
+    echo "Installing npm dependencies..."
     npm ci --verbose
-    echo "Setup phase completed."
   '';
   
   buildPhase = ''
-    export HOME=$TMPDIR
+    echo "build phase..."
+    
+    # Make sure npm uses the same cache directory
+    export npm_config_cache=$(pwd)/.npm-cache
+    export HOME=$(pwd)
+    
+    # Use hereby to build the project
+    echo "Running hereby build..."
     ./node_modules/.bin/hereby build
   '';
   
   installPhase = ''
-    # Create output directory
+    echo "install phase..."
     mkdir -p $out/bin
     
-    # Install the tsgo binary
-    install -Dm755 built/local/tsgo $out/bin/tsgo
-    
-    # Create a directory for the repo content (needed for LSP)
-    mkdir -p $out/lib/typescript-go
-    cp -r . $out/lib/typescript-go
-    
-    # Create wrapper for each hereby command
-    for cmd in build test install-tools lint format generate; do
-      cat > $out/bin/tsgo-$cmd <<EOF
-#!/bin/sh
-cd $out/lib/typescript-go
-./node_modules/.bin/hereby $cmd "\$@"
-EOF
-      chmod +x $out/bin/tsgo-$cmd
-    done
-    
-    # Create wrapper for LSP
-    cat > $out/bin/tsgo-lsp <<EOF
-#!/bin/sh
-cd $out/lib/typescript-go
-# Instructions for setting up the LSP with VS Code or other editors
-echo "To use the LSP with VS Code:"
-echo "1. Open VS Code in your project: code ."
-echo "2. Copy .vscode/launch.template.json to .vscode/launch.json"
-echo "3. Press F5 or use Debug: Start Debugging"
-echo ""
-echo "This will launch a new VS Code instance with the TypeScript-Go language server."
-EOF
-    chmod +x $out/bin/tsgo-lsp
+    # Copy the built binary to the output
+    if [ -f "built/local/tsgo" ]; then
+      echo "Copying tsgo binary to $out/bin"
+      cp -v built/local/tsgo $out/bin/tsgo
+      chmod +x $out/bin/tsgo
+    else
+      echo "ERROR: built/local/tsgo not found!"
+      echo "Contents of built directory (if it exists):"
+      ls -la built || echo "built directory does not exist"
+      exit 1
+    fi
   '';
   
   # Make sure the phases run in the right order
