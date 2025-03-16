@@ -1,0 +1,16 @@
+{
+  "typescript-go-nightly": {
+    "version": "a61f96ab090fa379e85afa409ab46ba16606f61c",
+    "sha256": "237ca46a0fe268d965732132143e88915c272a3c83c1e97c1c7d510327422bcf",
+    "url": "https://github.com/microsoft/typescript-go/archive/a61f96ab090fa379e85afa409ab46ba16606f61c.tar.gz",
+    "date": "2025-03-15",
+    "commit": "a61f96ab090fa379e85afa409ab46ba16606f61c"
+  },
+  "nightly-2025-03-15": {
+    "version": "a61f96ab090fa379e85afa409ab46ba16606f61c",
+    "sha256": "237ca46a0fe268d965732132143e88915c272a3c83c1e97c1c7d510327422bcf",
+    "url": "https://github.com/microsoft/typescript-go/archive/a61f96ab090fa379e85afa409ab46ba16606f61c.tar.gz",
+    "date": "2025-03-15",
+    "commit": "a61f96ab090fa379e85afa409ab46ba16606f61c"
+  }
+}
