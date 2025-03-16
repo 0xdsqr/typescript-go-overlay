@@ -4,12 +4,6 @@ set -e
 
 echo "Updating TypeScript-Go versions..."
 
-# Create a starter sources.json if it doesn't exist or is empty
-if [ ! -s sources.json ]; then
-  echo "Initializing sources.json..."
-  echo '{}' > sources.json
-fi
-
 # ----- Update TypeScript-Go Nightly -----
 # Get latest commit from TypeScript-Go main branch
 LATEST_COMMIT=$(curl -s "https://api.github.com/repos/microsoft/typescript-go/commits/main" | jq -r '.sha')
