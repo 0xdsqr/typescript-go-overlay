@@ -1,46 +1,41 @@
-{ pkgs ? import <nixpkgs> {}, system ? builtins.currentSystem, sources ? null }:
+# default.nix
+{ pkgs, lib ? pkgs.lib, sourceInfo }:
 
-let
-  _sources = if sources != null then sources else import ./sources.nix { inherit pkgs; };
-  
-  version = _sources.typescript-go.version;
-  
-  fetchTypescriptGo = { version, sha256 }:
-    pkgs.fetchFromGitHub {
-      owner = "microsoft";
-      repo = "typescript-go";
-      rev = version;
-      inherit sha256;
-      fetchSubmodules = true; # Critical: initializes the TypeScript submodule automatically
-    };
-
-in pkgs.stdenv.mkDerivation rec {
+pkgs.stdenv.mkDerivation rec {
   pname = "typescript-go";
-  inherit version;
+  version = sourceInfo.version;
   
-  src = fetchTypescriptGo {
-    inherit version;
-    sha256 = _sources.typescript-go.sha256;
+  src = pkgs.fetchFromGitHub {
+    owner = "microsoft";
+    repo = "typescript-go";
+    rev = sourceInfo.commit or sourceInfo.version;
+    sha256 = sourceInfo.sha256;
+    fetchSubmodules = true; # Critical: initializes the TypeScript submodule
   };
   
+  # Build-time dependencies
   nativeBuildInputs = with pkgs; [
     go_1_24
-    nodejs_22
+    nodejs_20
     git
   ];
   
+  # Run-time dependencies (minimal for this package)
   buildInputs = [];
   
+  # Setup phase - install npm dependencies including hereby
   setupPhase = ''
     export HOME=$TMPDIR
     npm ci
   '';
   
+  # Build the project using 'hereby'
   buildPhase = ''
     export HOME=$TMPDIR
     ./node_modules/.bin/hereby build
   '';
   
+  # Install the binaries and create helper scripts
   installPhase = ''
     # Create output directory
     mkdir -p $out/bin
@@ -77,9 +72,10 @@ EOF
     chmod +x $out/bin/tsgo-lsp
   '';
   
+  # Make sure the phases run in the right order
   phases = [ "unpackPhase" "setupPhase" "buildPhase" "installPhase" ];
   
-  meta = with pkgs.lib; {
+  meta = with lib; {
     description = "An implementation of TypeScript in Go";
     homepage = "https://github.com/microsoft/typescript-go";
     license = licenses.mit;

@@ -1,9 +1,9 @@
+# flake.nix
 {
   description = "TypeScript-Go - An implementation of TypeScript in Go";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    # Used for shell.nix
     flake-compat = {
       url = "github:edolstra/flake-compat";
       flake = false;
@@ -16,46 +16,35 @@
           inherit system;
         };
         
+        # Import the sources.json for versioning
         sources = builtins.fromJSON (builtins.readFile ./sources.json);
         
+        # Create an overlay for TypeScript-Go
         typescript-go-overlay = final: prev: {
+          # Latest nightly build of TypeScript-Go
           typescript-go-nightly = final.callPackage ./default.nix {
-            sources = {
-              typescript-go = sources["typescript-go-nightly"];
-            };
+            sourceInfo = sources.typescript-go-nightly;
           };
-          
-          typescript-go-dated = 
-            builtins.mapAttrs 
-              (name: value: 
-                if builtins.match "nightly-.*" name != null then
-                  final.callPackage ./default.nix {
-                    sources = {
-                      typescript-go = value;
-                    };
-                  }
-                else null
-              )
-              (builtins.removeAttrs sources ["typescript-go" "typescript-go-nightly"]);
         };
       in
       {
+        # Overlays for use in other flakes
         overlays.default = typescript-go-overlay;
         
+        # Packages for direct use
         packages = {
+          # Default is the nightly version for now
           default = pkgs.callPackage ./default.nix {
-            sources = {
-              typescript-go = sources["typescript-go-nightly"];
-            };
+            sourceInfo = sources.typescript-go-nightly;
           };
           
+          # Nightly build explicitly named
           typescript-go-nightly = pkgs.callPackage ./default.nix {
-            sources = {
-              typescript-go = sources["typescript-go-nightly"];
-            };
+            sourceInfo = sources.typescript-go-nightly;
           };
         };
         
+        # Apps for direct execution with nix run
         apps = {
           default = {
             type = "app";
@@ -63,6 +52,7 @@
           };
         };
         
+        # Development shell with all dependencies
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             go_1_24
@@ -78,10 +68,6 @@
             echo "Commands:"
             echo "  ./update.sh            - Update sources.json with latest TypeScript-Go"
             echo ""
-            echo "After cloning TypeScript-Go:"
-            echo "  git submodule update --init --recursive"
-            echo "  npm ci"
-            echo "  hereby build"
           '';
         };
         
