@@ -16,7 +16,7 @@ In your `flake.nix` file:
 
 ```nix
 {
-  inputs.typescript-go-overlay.url = "github:daveved/typescript-go-overlay";
+  inputs.typescript-go-overlay.url = "github:0xdsqr/typescript-go-overlay";
   outputs = { self, typescript-go-overlay, ... }: {
     # Your outputs here
   };
@@ -27,10 +27,10 @@ In a shell:
 
 ```sh
 # Run the latest nightly version
-$ nix run 'github:daveved/typescript-go-overlay'
+$ nix run 'github:0xdsqr/typescript-go-overlay'
 
 # Open a shell with the latest nightly version
-$ nix shell 'github:daveved/typescript-go-overlay'
+$ nix shell 'github:0xdsqr/typescript-go-overlay'
 ```
 
 ### Direct Package Usage
@@ -42,7 +42,7 @@ You can use typescript-go-overlay directly in your flake, similar to how you mig
   description = "Your Project";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    typescript-go-overlay.url = "github:daveved/typescript-go-overlay";
+    typescript-go-overlay.url = "github:0xdsqr/typescript-go-overlay";
   };
   outputs = { self, nixpkgs, typescript-go-overlay }: 
     let
@@ -74,7 +74,7 @@ If you prefer, you can also use typescript-go-overlay as a nixpkgs overlay:
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    typescript-go-overlay.url = "github:daveved/typescript-go-overlay";
+    typescript-go-overlay.url = "github:0xdsqr/typescript-go-overlay";
   };
   
   outputs = { self, nixpkgs, typescript-go-overlay, ... }:
@@ -111,7 +111,7 @@ You can also use it directly without configuration:
 
 ```bash
 # Install the latest nightly build
-nix profile install github:daveved/typescript-go-overlay
+nix profile install github:0xdsqr/typescript-go-overlay
 
 # Run typescript-go
 tsgo --help
