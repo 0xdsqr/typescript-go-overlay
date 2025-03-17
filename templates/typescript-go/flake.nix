@@ -43,26 +43,5 @@
           };
         }
       );
-      
-      apps = forAllSystems (system:
-        let
-          pkgs = import nixpkgs {
-            inherit system;
-          };
-          typescript-go = typescript-go-overlay.packages.${system}.default;
-          runTypeScript = pkgs.writeShellScriptBin "run-typescript" ''
-            set -e
-            echo "📝 Compiling TypeScript with TypeScript-Go..."
-            ${typescript-go}/bin/tsc-go test.ts
-            echo "🚀 Running the compiled JavaScript..."
-            ${pkgs.nodejs_22}/bin/node test.js
-          '';
-        in {
-          default = {
-            type = "app";
-            program = "${runTypeScript}/bin/run-typescript";
-          };
-        }
-      );
     };
 }
