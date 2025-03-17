@@ -1,3 +1,7 @@
 sources.old.json
 sources.new.json
 result
+
+# template node
+dist
+node_modules
