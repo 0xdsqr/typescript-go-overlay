@@ -1,4 +1,5 @@
-(import
+(
+  import
   (
     let
       flake-compat = (builtins.fromJSON (builtins.readFile ./flake.lock)).nodes.flake-compat;
@@ -8,5 +9,6 @@
         sha256 = flake-compat.locked.narHash;
       }
   )
-  {src = ./.;})
+  {src = ./.;}
+)
 .shellNix
