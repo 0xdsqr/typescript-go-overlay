@@ -19,17 +19,6 @@ Add this overlay to your flake inputs:
 }
 ```
 
-#### Running the TypeScript-Go Nightly Compiler
-
-```bash
-# Run the latest nightly version
-$ nix run 'github:daveved/typescript-go-overlay'
-# Open a shell with the latest nightly
-$ nix shell 'github:daveved/typescript-go-overlay'
-# Access a specific dated nightly build (if available)
-$ nix shell 'github:daveved/typescript-go-overlay#nightly-2025-03-15'
-```
-
 ## Thanks
 
-Project structure was taken from [here](https://github.com/mitchellh/zig-overlay/tree/main) as a base. Mitchell Hashimoto's GitHub seems to be a knowledge bank for Nix. Thanks for the learning baseline.
+Project structure was taken from this [zig-overlay](https://github.com/mitchellh/zig-overlay/tree/main) as a base thanks @Mitchell Hashimoto.
