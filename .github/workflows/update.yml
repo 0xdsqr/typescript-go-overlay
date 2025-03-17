@@ -12,8 +12,8 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
       - run: ./update
-      #- run: "git config user.email dave.dennis@users.noreply.github.com"
-      #- run: "git config user.name typescript-go-overlay
-      #- run: "git add -A"
-      #- run: "git commit -m 'ci: update sources.json' | true"
-      #- run: "git push -u origin main"
+      - run: "git config user.email dave.dennis@users.noreply.github.com"
+      - run: "git config user.name typescript-go-overlay"
+      - run: "git add -A"
+      - run: 'git commit -m "ci: update sources.json $(date +%Y-%m-%d-%H:%M)" || true'
+      - run: "git push -u origin main"

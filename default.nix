@@ -5,7 +5,7 @@ pkgs.stdenv.mkDerivation rec {
   src = pkgs.fetchgit {
     url = "https://github.com/microsoft/typescript-go.git";
     rev = sourceInfo.commit or sourceInfo.version;
-    sha256 = "sha256-cPu/DdgW7HEQcH8kcu6dazEgHEXsTVMnZ2feqVR5gNA="; # Will be updated by --update-input
+    sha256 = sourceInfo.sha256; # Will be updated by --update-input
     fetchSubmodules = true;
     leaveDotGit = false;
   };

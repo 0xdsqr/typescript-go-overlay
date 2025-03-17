@@ -1,63 +1,96 @@
 #!/usr/bin/env nix-shell
-#! nix-shell -p curl jq nix -i sh
-set -e
+#! nix-shell -p curl jq nix-prefetch-git -i sh
 
+set -e
 echo "Updating TypeScript-Go versions..."
 
-# ----- Update TypeScript-Go Nightly -----
-# Get latest commit from TypeScript-Go main branch
+# Fetch the latest commit SHA from the main branch
 LATEST_COMMIT=$(curl -s "https://api.github.com/repos/microsoft/typescript-go/commits/main" | jq -r '.sha')
 echo "Latest commit: ${LATEST_COMMIT}"
 
-# Get current commit from sources.json 
-CURRENT_COMMIT=$(jq -r '.["typescript-go-nightly"].commit // "none"' sources.json)
-echo "Current commit: ${CURRENT_COMMIT}"
-
-# Check if we already have the latest commit
-if [ "$LATEST_COMMIT" = "$CURRENT_COMMIT" ]; then
-  echo "Already at latest commit: ${LATEST_COMMIT}"
-  exit 0
+# Check if we already have the latest commit in sources.json
+if [ -f "sources.json" ]; then
+  CURRENT_COMMIT=$(jq -r '.["typescript-go-nightly"].commit // "none"' sources.json)
+  echo "Current commit: ${CURRENT_COMMIT}"
+  
+  if [ "$LATEST_COMMIT" = "$CURRENT_COMMIT" ]; then
+    echo "Already at latest commit: ${LATEST_COMMIT}"
+    exit 0
+  fi
 fi
 
 # Get current date for versioning
 CURRENT_DATE=$(date +%Y-%m-%d)
 
-# Set up the tarball URL
-TARBALL_URL="https://github.com/microsoft/typescript-go/archive/${LATEST_COMMIT}.tar.gz"
+# Fetch repository and compute SHA256 hash
+echo "Fetching repository with submodules..."
+RESULT=$(nix-prefetch-git --url https://github.com/microsoft/typescript-go.git --rev "$LATEST_COMMIT" --fetch-submodules)
 
-# Get the SHA256 hash in Nix format (hex) and convert to base64
-SHA256_HEX=$(nix-prefetch-url --unpack ${TARBALL_URL} 2>/dev/null)
-SHA256_NIX=$(nix hash convert --type sha256 --to base64 ${SHA256_HEX})
-echo "SHA256 (base64): ${SHA256_NIX}"
+# Extract the base32 SHA256 hash
+BASE32_HASH=$(echo "$RESULT" | jq -r '.sha256')
+echo "SHA256 (base32): ${BASE32_HASH}"
 
-# Create a temporary file with the new entries
-cat > sources.new.json << EOF
+# Convert to SRI format
+SRI_HASH=$(nix hash convert --hash-algo sha256 --to sri "${BASE32_HASH}")
+echo "SHA256 (SRI format): ${SRI_HASH}"
+
+# Update sources.json
+if [ -f "sources.json" ]; then
+  echo "Updating sources.json..."
+  
+  # Create temporary JSON with new entries
+  cat > sources.new.json << EOF
 {
   "typescript-go-nightly": {
     "version": "${LATEST_COMMIT}",
-    "sha256": "${SHA256_NIX}",
-    "url": "${TARBALL_URL}",
+    "sha256": "${SRI_HASH}",
     "date": "${CURRENT_DATE}",
     "commit": "${LATEST_COMMIT}"
   },
   "nightly-${CURRENT_DATE}": {
     "version": "${LATEST_COMMIT}",
-    "sha256": "${SHA256_NIX}",
-    "url": "${TARBALL_URL}",
+    "sha256": "${SRI_HASH}",
     "date": "${CURRENT_DATE}",
     "commit": "${LATEST_COMMIT}"
   }
 }
 EOF
 
-# Make a backup of the current sources.json
-cp sources.json sources.old.json
+  # Make a backup of the current sources.json
+  cp sources.json sources.old.json
+  
+  # Merge the new entries with the existing file
+  jq -s '.[0] * .[1]' sources.json sources.new.json > sources.json.tmp
+  mv sources.json.tmp sources.json
+  
+  # Clean up
+  rm -f sources.new.json
+  
+  echo "Updated sources.json with commit ${LATEST_COMMIT} (${CURRENT_DATE})"
+else
+  echo "Creating new sources.json..."
+  
+  # Create a new sources.json file
+  cat > sources.json << EOF
+{
+  "typescript-go-nightly": {
+    "version": "${LATEST_COMMIT}",
+    "sha256": "${SRI_HASH}",
+    "date": "${CURRENT_DATE}",
+    "commit": "${LATEST_COMMIT}"
+  },
+  "nightly-${CURRENT_DATE}": {
+    "version": "${LATEST_COMMIT}",
+    "sha256": "${SRI_HASH}",
+    "date": "${CURRENT_DATE}",
+    "commit": "${LATEST_COMMIT}"
+  }
+}
+EOF
+  
+  echo "Created sources.json with commit ${LATEST_COMMIT} (${CURRENT_DATE})"
+fi
 
-# Merge the new entries with the existing file
-jq -s '.[0] * .[1]' sources.json sources.new.json > sources.json.tmp
-mv sources.json.tmp sources.json
-
-echo "Updated TypeScript-Go nightly to commit ${LATEST_COMMIT} (${CURRENT_DATE})"
-
-# Clean up
-rm -f sources.new.json
+echo ""
+echo "For use in your Nix file with fetchgit:"
+echo "sha256 = \"${SRI_HASH}\";"
