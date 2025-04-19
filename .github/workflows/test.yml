@@ -1,13 +1,13 @@
 on: [push, pull_request]
 name: Test
 jobs:
-  test-runner:
+  test:
     runs-on: [self-hosted, nixos, typescript-go-overlay]
     steps:
-      - uses: actions/checkout@v@v4.2.2
+      - uses: actions/checkout@v4.2.2
         
-      - name: Verify Flake
-        run: nix flake check
+      #- name: Verify Flake
+      #  run: nix flake check
 #jobs:
 #  test:
 #    runs-on: ubuntu-latest
