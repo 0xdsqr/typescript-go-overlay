@@ -4,32 +4,10 @@ jobs:
   test-runner:
     runs-on: [self-hosted, nixos, typescript-go-overlay]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v@v4.2.2
         
-      - name: Show environment info
-        run: |
-          echo "Current directory:"
-          pwd
-          
-          echo "Directory contents:"
-          ls -la
-          
-          echo "Nix Version:"
-          nix --version
-          
-          echo "System info:"
-          uname -a
-          
-          echo "Runner labels:"
-          echo $GITHUB_RUNNER_LABELS
-          
-          echo "Available tools:"
-          echo "git: $(which git)"
-          echo "curl: $(which curl)"
-          echo "jq: $(which jq)"
-          
-          echo "Test complete!"
+      - name: Verify Flake
+        run: nix flake check
 #jobs:
 #  test:
 #    runs-on: ubuntu-latest
