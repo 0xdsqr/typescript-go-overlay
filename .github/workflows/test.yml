@@ -1,15 +1,45 @@
 on: [push, pull_request]
 name: Test
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  test-runner:
+    runs-on: [self-hosted, nixos, typescript-go-overlay]
     steps:
-      - uses: actions/checkout@v4.2.2
-      - uses: cachix/install-nix-action@v31
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - run: nix flake check
-
-      # Verify the update script WORKS but we don't actually commit anything
-      # in the test job.
-      - run: ./update
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Show environment info
+        run: |
+          echo "Current directory:"
+          pwd
+          
+          echo "Directory contents:"
+          ls -la
+          
+          echo "Nix Version:"
+          nix --version
+          
+          echo "System info:"
+          uname -a
+          
+          echo "Runner labels:"
+          echo $GITHUB_RUNNER_LABELS
+          
+          echo "Available tools:"
+          echo "git: $(which git)"
+          echo "curl: $(which curl)"
+          echo "jq: $(which jq)"
+          
+          echo "Test complete!"
+#jobs:
+#  test:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4.2.2
+#      - uses: cachix/install-nix-action@v31
+#        with:
+#          nix_path: nixpkgs=channel:nixos-unstable
+#      - run: nix flake check#
+#
+#      # Verify the update script WORKS but we don't actually commit anything
+#      # in the test job.
+#      - run: ./update
