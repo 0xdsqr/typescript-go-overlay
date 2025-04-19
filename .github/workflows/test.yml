@@ -6,8 +6,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4.2.2
         
-      #- name: Verify Flake
-      #  run: nix flake check
+      - name: Verify Falke Integerity
+      - run: nix flake check
 #jobs:
 #  test:
 #    runs-on: ubuntu-latest
