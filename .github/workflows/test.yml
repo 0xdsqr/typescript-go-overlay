@@ -5,9 +5,9 @@ jobs:
     runs-on: [self-hosted, nixos, typescript-go-overlay]
     steps:
       - uses: actions/checkout@v4.2.2
-        
-      - name: Verify Falke Integerity
-      - run: nix flake check
+
+      - name: Verify Flake Integrity
+        run: nix flake check
 #jobs:
 #  test:
 #    runs-on: ubuntu-latest
