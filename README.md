@@ -1,5 +1,9 @@
 # typescript-go-overlay
 
+Please do note:
+
+> This project is slow to use,i would not use it right now, built to learn some stuff, i will move it to use go and it will work better, once i have time. As of today it's using herby with npm install (no good for nix)
+
 This repository is a Nix flake packaging the [typescript-go](https://github.com/microsoft/typescript-go) project. The flake tracks and builds Microsoft's TypeScript Go implementation, providing nightly builds based on the latest commit at the time.
 
 * **Nightly Builds**: Automatically tracks the latest commits from typescript-go
