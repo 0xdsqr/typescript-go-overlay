@@ -13,8 +13,8 @@ jobs:
       - name: Verify Flake Integrity
         run: nix flake check
       
-      - name: Bing Bong
-        run: nix --version
+      #- name: Bing Bong
+      #  run: nix --version
 #jobs:
 #  test:
 #    runs-on: ubuntu-latest
