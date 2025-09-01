@@ -1,10 +1,10 @@
 {
   "typescript-go-nightly": {
-    "version": "0a3c816da9be581f3b567df9f05b73533f5c9384",
-    "sha256": "sha256-+Dt437g9smnMm+vE5EaMUs07wIYkDAFCMNDXV6SdvQw=",
+    "version": "71accec3dd638f5e8dcd34ed45399245fb3f5002",
+    "sha256": "sha256-qq1S4EXR+I4EK799RcPjAVGxRABs+G2RcSMNaB83aec=",
     "url": "https://github.com/microsoft/typescript-go/archive/a61f96ab090fa379e85afa409ab46ba16606f61c.tar.gz",
-    "date": "2025-08-30",
-    "commit": "0a3c816da9be581f3b567df9f05b73533f5c9384"
+    "date": "2025-09-01",
+    "commit": "71accec3dd638f5e8dcd34ed45399245fb3f5002"
   },
   "nightly-2025-03-16": {
     "version": "42f1589989c2a6e54022a3ce8d9c56df8e25c146",
@@ -774,5 +774,11 @@
     "sha256": "sha256-+Dt437g9smnMm+vE5EaMUs07wIYkDAFCMNDXV6SdvQw=",
     "date": "2025-08-30",
     "commit": "0a3c816da9be581f3b567df9f05b73533f5c9384"
+  },
+  "nightly-2025-09-01": {
+    "version": "71accec3dd638f5e8dcd34ed45399245fb3f5002",
+    "sha256": "sha256-qq1S4EXR+I4EK799RcPjAVGxRABs+G2RcSMNaB83aec=",
+    "date": "2025-09-01",
+    "commit": "71accec3dd638f5e8dcd34ed45399245fb3f5002"
   }
 }
