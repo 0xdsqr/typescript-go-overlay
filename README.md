@@ -1,5 +1,7 @@
 # typescript-go-overlay
 
+This project is now archived since A preview build is available on npm as @typescript/native-preview, and owned by the offical development team. Someone could add this to nix node pacakges if they want.
+
 Please do note:
 
 > This project is slow to use,i would not use it right now, built to learn some stuff, i will move it to use go and it will work better, once i have time. As of today it's using herby with npm install (no good for nix)
